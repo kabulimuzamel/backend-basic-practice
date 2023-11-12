@@ -17,14 +17,20 @@ app.post('/getwhatyougive', (req, res) => {
 
 // Third
 
-app.get('/readpath/:path', async (req,res) => {
+// There is a difference between query and params
+    // query param = /readpath?path=sdkfaslf
+    // req param = /readpath/:path
+
+app.get('/readpath', async (req,res) => {
     try {
-        const files = await readdir(`${req.params.path}`);
+        const files = await readdir(`${req.query.path}`);
         res.send(files);
     } catch (err) {
         res.send(err);
     }
-})
+});
+
+
 
 app.listen(3000, () => {
     console.log('Listening on port 3000...')
