@@ -1,65 +1,39 @@
 const express = require('express');
 const app = express();
 const cors = require('cors')
+const fs = require('fs');
 app.use(express.json());
+app.use(cors('http://localhost:3001'))
 
 let commentData = [];
 
-// let commentData = [
-//     {
-//         comment: 'That is beautiful',
-//         replies: [
-//             {
-//                 comment: 'That is beautiful',
-//                 replies: []
-//             },
-//         ]
-//     },
-//     {
-//         comment: 'That is beautiful',
-//         replies: [
-//             {
-//                 comment: 'That is beautiful',
-//                 replies: []
-//             },
-//             {
-//                 comment: 'That is beautiful',
-//                 replies: []
-//             }
-//         ]
-//     },
-//     {
-//         comment: 'That is beautiful',
-//         replies: [
-//             {
-//                 comment: 'That is beautiful',
-//                 replies: []
-//             },
-//             {
-//                 comment: 'That is beautiful',
-//                 replies: []
-//             },
-//             {
-//                 comment: 'That is beautiful',
-//                 replies: []
-//             }
-//         ]
-//     }
-// ];
+try {
+    commentData = fs.readFileSync('commentsFile.js')
+    commentData = JSON.parse(commentData)
+} catch(err) {
+    console.log(err)
+}
 
-app.use(cors('http://localhost:3001'))
+
 
 app.get('/commentData', (req, res) => {
     res.send(commentData);
 });
 
 app.post('/addComment', (req, res) => {
-    commentData.push({
+    commentData.unshift({
         comment: req.body.input,
         replies: []
     });
 
-    res.status(200);
+    fs.writeFile('commentsFile.js', JSON.stringify(commentData), (err) => {
+        if (err) {
+            console.error(err);
+            res.status(500);
+        } else {
+            res.status(200).send(commentData);
+        }
+      });
 })
 
 app.post('/setComment', (req, res) => {
@@ -70,7 +44,14 @@ app.post('/setComment', (req, res) => {
       replies = replies[index].replies; 
     });
     replies.push({comment: input, replies: []});
-    res.status(200).send(commentData);
+    fs.writeFile('commentsFile.js', JSON.stringify(commentData), (err) => {
+        if (err) {
+            console.error(err);
+            res.status(500);
+        } else {
+            res.status(200).send(commentData);
+        }
+      });
 })
 
 
