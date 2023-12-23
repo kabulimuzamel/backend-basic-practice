@@ -13,7 +13,7 @@ try {
 } catch(err) {
     console.log(err)
 }
-
+// REST architecture is stateless
 
 
 app.get('/commentData', (req, res) => {
@@ -25,15 +25,7 @@ app.post('/addComment', (req, res) => {
         comment: req.body.input,
         replies: []
     });
-
-    fs.writeFile('commentsFile.js', JSON.stringify(commentData), (err) => {
-        if (err) {
-            console.error(err);
-            res.status(500);
-        } else {
-            res.status(200).send(commentData);
-        }
-      });
+    writeFile(res)
 })
 
 app.post('/setComment', (req, res) => {
@@ -44,6 +36,10 @@ app.post('/setComment', (req, res) => {
       replies = replies[index].replies; 
     });
     replies.push({comment: input, replies: []});
+    writeFile(res)
+})
+
+function writeFile(res) {
     fs.writeFile('commentsFile.js', JSON.stringify(commentData), (err) => {
         if (err) {
             console.error(err);
@@ -51,9 +47,8 @@ app.post('/setComment', (req, res) => {
         } else {
             res.status(200).send(commentData);
         }
-      });
-})
-
+    });
+}
 
 
 app.listen(3000, () => {
